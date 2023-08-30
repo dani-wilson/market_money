@@ -1,6 +1,13 @@
 class Api::V0::MarketsController < ApplicationController
   def index
-    markets = Market.all
-    render json: MarketSerializer.format_markets(markets)
+    render json: MarketSerializer.new(Market.all)
+  end
+
+  def show
+    render json: MarketSerializer.new(Market.find(params[:id]))
+  end
+
+  rescue_from ActiveRecord::RecordNotFound do |exception|
+    render json: { error: "Market not found" }, status: :not_found
   end
 end

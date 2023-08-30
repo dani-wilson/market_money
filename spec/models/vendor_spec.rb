@@ -7,6 +7,7 @@ RSpec.describe Vendor, type: :model do
     it { should validate_presence_of :contact_phone }
     it { should validate_presence_of :contact_name }
     it { should validate_presence_of :credit_accepted }
+    # it { should validate_inclusion_of(:credit_accepted).in_array([true, false]) }
   end
 
   describe "relationships" do

@@ -10,12 +10,4 @@ FactoryBot.define do
     lat { Faker::Address.latitude }
     lon { Faker::Address.longitude }
   end
-
-  factory :vendor do
-    name { "#{ Faker::Dessert.flavor } #{ Faker::Ancient.primordial } #{ Faker::Creature::Animal }" }
-    description { Faker::TvShows::NewGirl.quote }
-    contact_name { Faker::Name.unique.name }
-    contact_phone { Faker::PhoneNumber.unique }
-    credit_accepted { Faker::Boolean }
-  end
 end

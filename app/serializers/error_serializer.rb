@@ -1,9 +1,14 @@
 class ErrorSerializer
-  def self.format_error(error)
+  def initialize(error_object)
+    @error_object = error_object
+  end
+
+  def self.serialize_json(error_object)
     {
       errors: [
         {
-          details: error.message
+          status: error_object.status.to_s,
+          title: error_object.message
         }
       ]
     }

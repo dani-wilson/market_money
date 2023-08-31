@@ -55,7 +55,7 @@ RSpec.describe "vendor requests" do
 
       vendor = JSON.parse(response.body, symbolize_names: true)
 
-      expect(vendor[:errors][0][:details]).to eq("Couldn't find Vendor with 'id'=30")
+      expect(vendor[:errors][0][:title]).to eq("Couldn't find Vendor with 'id'=30")
     end
   end
 
@@ -121,7 +121,7 @@ RSpec.describe "vendor requests" do
     expect(response.status).to eq(400)
 
     vendor = JSON.parse(response.body, symbolize_names: true)
-    expect(vendor[:errors][0][:details]).to eq("Validation failed: Description can't be blank")
+    expect(vendor[:errors][0][:title]).to eq("Validation failed: Description can't be blank")
   end
 
   it "testing my boolean just for fun" do
@@ -138,10 +138,36 @@ RSpec.describe "vendor requests" do
     expect(response.status).to eq(400)
 
     vendor = JSON.parse(response.body, symbolize_names: true)
-    expect(vendor[:errors][0][:details]).to eq("Validation failed: Credit accepted can't be blank, Credit accepted is not included in the list")
+    expect(vendor[:errors][0][:title]).to eq("Validation failed: Credit accepted can't be blank, Credit accepted is not included in the list")
   end
 
-  it "can update a vendor" do
+  it "can update an existing vendor" do
+    id = create(:vendor).id
+    previous_name = Vendor.last.name
+    vendor_params = { name: "PD Woods" }
+    headers = {"CONTENT_TYPE" => "application/json"}
+
+    patch "/api/v0/vendors/#{id}", headers: headers, params: JSON.generate({vendor: vendor_params})
+    vendor = Vendor.find_by(id: id)
+
+    expect(response).to be_successful
+    expect(vendor.name).to_not eq(previous_name)
+    expect(vendor.name).to eq("PD Woods")
+  end
+
+  it "will throw an error if updated with empty or nil attribute" do
+    id = create(:vendor).id
+    vendor_params = { name: " " }
+    headers = {"CONTENT_TYPE" => "application/json"}
+
+    patch "/api/v0/vendors/#{id}", headers: headers, params: JSON.generate({vendor: vendor_params})
     
+    expect(response).to_not be_successful
+    expect(response.status).to eq(400)
+
+    vendor = JSON.parse(response.body, symbolize_names: true)
+
+    expect(vendor[:errors][0][:title]).to eq("Validation failed")
+
   end
 end

@@ -107,6 +107,6 @@ describe "the market show page" do
     expect(response.status).to eq(404)
 
     market = JSON.parse(response.body, symbolize_names: true)
-    expect(market[:errors][0][:details]).to eq("Couldn't find Market with 'id'=1")
+    expect(market[:errors][0][:title]).to eq("Couldn't find Market with 'id'=1")
   end
 end

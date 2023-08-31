@@ -12,9 +12,15 @@ class Api::V0::VendorsController < ApplicationController
   end
 
   def update
-    @vendor = Vendor.find(params[:id])
-    @vendor.update!(vendor_params)
-    render json: VendorSerializer.new(@vendor)
+    vendor = Vendor.find(params[:id])
+    vendor.update!(vendor_params)
+    render json: VendorSerializer.new(vendor)
+  end
+
+  def destroy
+    vendor = Vendor.find(params[:id])
+    vendor.destroy
+    render json: VendorSerializer.new(vendor), status: 204
   end
 
   private

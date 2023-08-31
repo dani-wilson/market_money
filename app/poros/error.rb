@@ -1,9 +1,9 @@
 class Error
-  attr_reader :error_message,
-              :status_code
+  attr_reader :message,
+              :status
 
-  def initialize(error_message, status_code)
-    @error_message = error_message
-    @status_code = status_code
+  def initialize(message, status)
+    @message = message
+    @status = status
   end
 end

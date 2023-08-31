@@ -119,5 +119,29 @@ RSpec.describe "vendor requests" do
 
     expect(response).to_not be_successful
     expect(response.status).to eq(400)
+
+    vendor = JSON.parse(response.body, symbolize_names: true)
+    expect(vendor[:errors][0][:details]).to eq("Validation failed: Description can't be blank")
+  end
+
+  it "testing my boolean just for fun" do
+    new_vendor_params = ({
+      name: "Neapolitan Thalassa Fish",
+      description: "Gave me cookie got you cookie!",
+      contact_name: "Hershel Smith CPA",
+      contact_phone: "480-465-1742"
+    })
+
+    post "/api/v0/vendors", params: {vendor: new_vendor_params}
+
+    expect(response).to_not be_successful
+    expect(response.status).to eq(400)
+
+    vendor = JSON.parse(response.body, symbolize_names: true)
+    expect(vendor[:errors][0][:details]).to eq("Validation failed: Credit accepted can't be blank, Credit accepted is not included in the list")
+  end
+
+  it "can update a vendor" do
+    
   end
 end

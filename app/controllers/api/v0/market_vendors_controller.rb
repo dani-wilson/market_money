@@ -13,9 +13,17 @@ class Api::V0::MarketVendorsController < ApplicationController
   end
 
   def create
-    @market = Market.find(params[:market_id])
-    @vendor = Vendor.find(params[:id])
-    new_market_vendor = MarketVendor.create(@market.id, @vendor.id)
-    render json: MarketVendorSerializer.new(@market, @vendor)
+    MarketVendor.create!(market_vendor_params)
+    render json: { "message": "Successfully added vendor to market."}, status: 201
+  end
+
+  def destroy
+    market_vendor = MarketVendor.find_by(market_id: market_vendor_params[:market_id], vendor_id: market_vendor_params[:vendor_id])
+    render json: market_vendor.destroy, status: 204
+  end
+
+  private
+  def market_vendor_params
+    params.require(:market_vendor).permit(:market_id, :vendor_id)
   end
 end

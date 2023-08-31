@@ -154,22 +154,68 @@ RSpec.describe "vendor requests" do
     expect(vendor.name).to_not eq(previous_name)
     expect(vendor.name).to eq("PD Woods")
   end
-  
+
   it "will throw an error if updated with empty or nil attribute" do
     id = create(:vendor).id
     vendor_params = { name: "" }
     headers = {"CONTENT_TYPE" => "application/json"}
 
     patch "/api/v0/vendors/#{id}", headers: headers, params: JSON.generate({vendor: vendor_params})
-    vendor = Vendor.find_by(id: id)
-
+    
     expect(response).to_not be_successful
     expect(response.status).to eq(400)
-
+    
     vendor = JSON.parse(response.body, symbolize_names: true)
-
+    
     expect(vendor[:errors][0][:status]).to eq("400")
-
+    
     expect(vendor[:errors][0][:title]).to eq("Validation failed: Name can't be blank")
+  end
+
+  it "can delete an existing vendor" do
+    vendor = create(:vendor)
+
+    expect(Vendor.count).to eq(1)
+
+    delete "/api/v0/vendors/#{vendor.id}"
+
+    expect(response).to be_successful
+    expect(response.status).to eq(204)
+    expect(Vendor.count).to eq(0)
+  end
+
+  it "will gracefully handle if a vendor id doesn't exist" do
+    get "/api/v0/vendors/1"
+
+    expect(response).to_not be_successful
+    expect(response.status).to eq(404)
+
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data[:errors]).to be_an(Array)
+    expect(data[:errors].first[:status]).to eq("404")
+    expect(data[:errors].first[:title]).to eq("Couldn't find Vendor with 'id'=1")
+  end
+
+  it "will delete any associations that vendor had" do
+    market_1 = create(:market)
+
+    vendor_1 = create(:vendor)
+    vendor_2 = create(:vendor)
+    vendor_3 = create(:vendor)
+
+    MarketVendor.create!(market: market_1, vendor: vendor_1)
+    MarketVendor.create!(market: market_1, vendor: vendor_2)
+    MarketVendor.create!(market: market_1, vendor: vendor_3)
+
+    expect(Vendor.count).to eq(3)
+    expect(MarketVendor.count).to eq(3)
+
+    delete "/api/v0/vendors/#{vendor_1.id}"
+
+    expect(response).to be_successful
+    expect(response.status).to eq(204)
+    expect(Vendor.count).to eq(2)
+    expect(MarketVendor.count).to eq(2)
   end
 end

@@ -1,6 +1,4 @@
 class Api::V0::VendorsController < ApplicationController
-  rescue_from ActiveRecord::RecordNotFound, with: :not_found_response
-  rescue_from ActiveRecord::RecordInvalid, with: :validation_error
   
   def show
     render json: VendorSerializer.new(Vendor.find(params[:id]))

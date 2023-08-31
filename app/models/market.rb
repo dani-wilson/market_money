@@ -9,7 +9,7 @@ class Market < ApplicationRecord
                           :lon,
                           :vendor_count
 
-  has_many :market_vendors
+  has_many :market_vendors, dependent: :destroy
   has_many :vendors, through: :market_vendors
 
   def vendor_count

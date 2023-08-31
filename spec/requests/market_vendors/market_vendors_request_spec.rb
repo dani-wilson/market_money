@@ -69,4 +69,20 @@ RSpec.describe "the market vendors index page" do
     
     expect(market[:errors][0][:title]).to eq("Couldn't find Market with 'id'=20")
   end
+
+  it "can create a new marketvendor" do
+    market_1 = create(:market)
+
+    vendor_1 = create(:vendor)
+    vendor_2 = create(:vendor)
+    vendor_3 = create(:vendor)
+
+    MarketVendor.create!(market: market_1, vendor: vendor_1)
+    MarketVendor.create!(market: market_1, vendor: vendor_2)
+    MarketVendor.create!(market: market_1, vendor: vendor_3)
+
+    post "/api/v0/market_vendors"
+
+    
+  end
 end

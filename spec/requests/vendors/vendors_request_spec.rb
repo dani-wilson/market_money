@@ -121,7 +121,7 @@ RSpec.describe "vendor requests" do
     expect(response.status).to eq(400)
 
     vendor = JSON.parse(response.body, symbolize_names: true)
-    expect(vendor[:errors][0][:title]).to eq("Validation failed: Description can't be blank")
+    expect(vendor[:errors][0][:title]).to eq("Validation failed: Description can't be blank, Description is too short (minimum is 1 character), Description 500 characters is the maximum allowed.")
   end
 
   it "testing my boolean just for fun" do
@@ -154,20 +154,22 @@ RSpec.describe "vendor requests" do
     expect(vendor.name).to_not eq(previous_name)
     expect(vendor.name).to eq("PD Woods")
   end
-
+  
   it "will throw an error if updated with empty or nil attribute" do
     id = create(:vendor).id
-    vendor_params = { name: " " }
+    vendor_params = { name: "" }
     headers = {"CONTENT_TYPE" => "application/json"}
 
     patch "/api/v0/vendors/#{id}", headers: headers, params: JSON.generate({vendor: vendor_params})
-    
+    vendor = Vendor.find_by(id: id)
+
     expect(response).to_not be_successful
     expect(response.status).to eq(400)
 
     vendor = JSON.parse(response.body, symbolize_names: true)
 
-    expect(vendor[:errors][0][:title]).to eq("Validation failed")
+    expect(vendor[:errors][0][:status]).to eq("400")
 
+    expect(vendor[:errors][0][:title]).to eq("Validation failed: Name can't be blank")
   end
 end

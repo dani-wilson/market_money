@@ -69,6 +69,4 @@ RSpec.describe "the market vendors index page" do
 
     expect(market[:errors][0][:details]).to eq("Couldn't find Market with 'id'=20")
   end
-
-  
 end

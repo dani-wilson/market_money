@@ -141,4 +141,112 @@ describe "the market show page" do
     data = JSON.parse(response.body, symbolize_names: true)
     expect(data[:data]).to be_an(Array)
   end
+
+  it "can search markets by state and city" do
+    create_list(:market, 3)
+
+    query_params = {
+      state: "colorado",
+      city: "denver"
+    }
+
+    get "/api/v0/markets/search", params: query_params
+    
+    expect(response).to be_successful
+    expect(response.status).to eq(200)
+
+    data = JSON.parse(response.body, symbolize_names: true)
+    expect(data[:data]).to be_an(Array)
+  end
+
+  it "can search markets by state, city, and name" do
+    create_list(:market, 3)
+
+    query_params = {
+      state: "utah",
+      city: "cedar city",
+      name: "Northern Waste"
+    }
+
+    get "/api/v0/markets/search", params: query_params
+    
+    expect(response).to be_successful
+    expect(response.status).to eq(200)
+
+    data = JSON.parse(response.body, symbolize_names: true)
+    expect(data[:data]).to be_an(Array)
+  end
+
+  it "can search markets by state and name" do
+    create_list(:market, 3)
+
+    query_params = {
+      state: "maryland",
+      name: "window of the west"
+    }
+
+    get "/api/v0/markets/search", params: query_params
+    
+    expect(response).to be_successful
+    expect(response.status).to eq(200)
+
+    data = JSON.parse(response.body, symbolize_names: true)
+    expect(data[:data]).to be_an(Array)
+  end
+
+  it "cannot search markets by city alone" do
+    query_params = {
+      city: "vernal"
+    }
+
+    get "/api/v0/markets/search", params: query_params
+
+    expect(response).to_not be_successful
+    expect(response.status).to eq(422)
+  end
+
+  it "cannot search by city and name alone" do
+    query_params = {
+      city: "vernal",
+      name: "something"
+    }
+
+    get "/api/v0/markets/search", params: query_params
+
+    expect(response).to_not be_successful
+    expect(response.status).to eq(422)
+  end
+
+  it "is successful even if only one market is returned" do
+    market_1 = Market.create!(name: "Spuds Galore", street: "Westchester St", city: "Crackledorf", county: "Murn", state: "New Hampshire", zip: "86071", lat: "333.212", lon: "3309.709")
+    market_2 = Market.create!(name: "Crafts n Shit", street: "Pebble Acres Drive", city: "Montpelier", county: "Dodd", state: "Utah", zip: "84066", lat: "30982.71", lon: "55509.72")
+
+    query_params = {
+      state: "New Hampshire"
+    }
+
+    get "/api/v0/markets/search", params: query_params
+    
+    expect(response).to be_successful
+    expect(response.status).to eq(200)
+
+    data = JSON.parse(response.body, symbolize_names: true)
+    expect(data[:data]).to be_an(Array)
+    expect(data[:data].count).to eq(1)
+  end
+
+  it "is successful even if no markets are returned" do
+    query_params = {
+      name: "hiddledeehoo"
+    }
+
+    get "/api/v0/markets/search", params: query_params
+    
+    expect(response).to be_successful
+    expect(response.status).to eq(200)
+
+    data = JSON.parse(response.body, symbolize_names: true)
+    expect(data[:data]).to be_an(Array)
+    expect(data[:data].count).to eq(0)
+  end
 end

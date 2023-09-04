@@ -109,4 +109,36 @@ describe "the market show page" do
     market = JSON.parse(response.body, symbolize_names: true)
     expect(market[:errors][0][:title]).to eq("Couldn't find Market with 'id'=1")
   end
+
+  it "can search markets by state" do
+    create_list(:market, 3)
+
+    query_params = {
+      state: "missouri"
+    }
+    
+    get "/api/v0/markets/search", params: query_params
+    
+    expect(response).to be_successful
+    expect(response.status).to eq(200)
+
+    data = JSON.parse(response.body, symbolize_names: true)
+    expect(data[:data]).to be_an(Array)
+  end
+
+  it "can search markets by name" do
+    create_list(:market, 3)
+
+    query_params = {
+      name: "Cape of Andrast"
+    }
+
+    get "/api/v0/markets/search", params: query_params
+    
+    expect(response).to be_successful
+    expect(response.status).to eq(200)
+
+    data = JSON.parse(response.body, symbolize_names: true)
+    expect(data[:data]).to be_an(Array)
+  end
 end

@@ -196,7 +196,7 @@ RSpec.describe "the market vendors index page" do
     post "/api/v0/market_vendors", headers: headers, params: JSON.generate({market_vendor: market_vendor_params})
 
     expect(response).to_not be_successful
-    expect(response.status).to eq(400)
+    expect(response.status).to eq(422)
     
     market_vendor = JSON.parse(response.body, symbolize_names: true)
     expect(market_vendor[:errors][0][:title]).to eq("Validation failed: Market has already been taken")
@@ -225,5 +225,22 @@ RSpec.describe "the market vendors index page" do
 
     expect(response).to be_successful
     expect(response.status).to eq(204)
+  end
+
+  it "throws an error if a market vendor cannot be found" do
+    market_vendor_params = ({
+      market_id: 17,
+      vendor_id: 29
+    })
+    headers = {"CONTENT_TYPE" => "application/json"}
+
+    delete "/api/v0/market_vendors/", headers: headers, params: JSON.generate(market_vendor: market_vendor_params)
+
+    expect(response).to_not be_successful
+    expect(response.status).to eq(404)
+    
+    data = JSON.parse(response.body, symbolize_names: true)
+    
+    expect(data[:message]).to eq("MarketVendor does not exist.")
   end
 end

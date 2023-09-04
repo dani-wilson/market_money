@@ -8,7 +8,12 @@ class ApplicationController < ActionController::API
   end
 
   def validation_error(error)
-    error_object = Error.new(error.message, 400)
-    render json: ErrorSerializer.serialize_json(error_object), status: error_object.status
+    if error.message == "Validation failed: Market has already been taken"
+      error_object = Error.new(error.message, 422)
+      render json: ErrorSerializer.serialize_json(error_object), status: error_object.status
+    else
+      error_object = Error.new(error.message, 400)
+      render json: ErrorSerializer.serialize_json(error_object), status: error_object.status
+    end
   end
 end

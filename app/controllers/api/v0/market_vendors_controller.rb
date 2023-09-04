@@ -19,7 +19,11 @@ class Api::V0::MarketVendorsController < ApplicationController
 
   def destroy
     market_vendor = MarketVendor.find_by(market_id: market_vendor_params[:market_id], vendor_id: market_vendor_params[:vendor_id])
-    render json: market_vendor.destroy, status: 204
+    if !market_vendor.nil?
+      render json: market_vendor.destroy, status: 204
+    else
+      render json: { "message": "MarketVendor does not exist." }, status: 404
+    end
   end
 
   private
